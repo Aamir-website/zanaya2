@@ -5,6 +5,10 @@ import { religionKits } from './data/kits';
 import { servicesByReligion } from './data/services';
 
 import { Homepage } from './components/Homepage';
+import { AboutPage } from './components/AboutPage';
+import { FAQPage } from './components/FAQPage';
+import { ServicesPage } from './components/ServicesPage';
+import { ContactPage } from './components/ContactPage';
 import { StepIndicator } from './components/StepIndicator';
 import { ReligionSelector } from './components/ReligionSelector';
 import { KitSelector } from './components/KitSelector';
@@ -24,9 +28,12 @@ const STEPS = [
   'Confirmation'
 ];
 
+type PageType = 'home' | 'about' | 'faq' | 'services' | 'contact';
+
 function App() {
   const [currentStep, setCurrentStep] = useState(0);
   const [showHomepage, setShowHomepage] = useState(true);
+  const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [bookingData, setBookingData] = useState<BookingData>({
     religion: null,
     selectedKitItems: [],
@@ -54,7 +61,16 @@ function App() {
 
   const handleBeginArrangement = () => {
     setShowHomepage(false);
+    setCurrentPage('home');
     setCurrentStep(1); // Start with religion selection
+  };
+
+  const handlePageNavigation = (page: PageType) => {
+    setCurrentPage(page);
+    setShowHomepage(page === 'home');
+    if (page === 'home') {
+      setCurrentStep(0);
+    }
   };
 
   const handleReligionSelect = (religion: Religion) => {
@@ -110,6 +126,7 @@ function App() {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     } else if (currentStep === 1) {
+      setCurrentPage('home');
       setShowHomepage(true);
       setCurrentStep(0);
     }
@@ -120,6 +137,22 @@ function App() {
   };
 
   const getCurrentStepContent = () => {
+    if (currentPage === 'about') {
+      return <AboutPage onBack={() => handlePageNavigation('home')} />;
+    }
+    
+    if (currentPage === 'faq') {
+      return <FAQPage onBack={() => handlePageNavigation('home')} />;
+    }
+    
+    if (currentPage === 'services') {
+      return <ServicesPage onBack={() => handlePageNavigation('home')} />;
+    }
+    
+    if (currentPage === 'contact') {
+      return <ContactPage onBack={() => handlePageNavigation('home')} />;
+    }
+    
     if (showHomepage) {
       return <Homepage onBeginArrangement={handleBeginArrangement} />;
     }
@@ -219,7 +252,7 @@ function App() {
         </div>
 
         {/* Navigation */}
-        {!showHomepage && currentStep > 0 && currentStep < 5 && (
+        {!showHomepage && currentPage === 'home' && currentStep > 0 && currentStep < 5 && (
           <div className="flex justify-between items-center max-w-4xl mx-auto">
             <button
               onClick={prevStep}
@@ -257,7 +290,7 @@ function App() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8 mt-16">
+      <footer className="bg-gray-900 text-white py-12 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Company Info */}
@@ -272,14 +305,42 @@ function App() {
               </p>
             </div>
 
-            {/* Quick Links */}
+            {/* Other Links */}
             <div>
-              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+              <h4 className="text-lg font-semibold mb-4">Other Links</h4>
               <ul className="space-y-2 text-gray-300">
-                <li><a href="#about" className="hover:text-white transition-colors">About Us</a></li>
-                <li><a href="#services" className="hover:text-white transition-colors">Our Services</a></li>
-                <li><a href="#contact" className="hover:text-white transition-colors">Contact</a></li>
-                <li><a href="#faq" className="hover:text-white transition-colors">FAQ</a></li>
+                <li>
+                  <button 
+                    onClick={() => handlePageNavigation('about')}
+                    className="hover:text-white transition-colors text-left"
+                  >
+                    About Us
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handlePageNavigation('services')}
+                    className="hover:text-white transition-colors text-left"
+                  >
+                    Our Services
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handlePageNavigation('contact')}
+                    className="hover:text-white transition-colors text-left"
+                  >
+                    Contact
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handlePageNavigation('faq')}
+                    className="hover:text-white transition-colors text-left"
+                  >
+                    FAQ
+                  </button>
+                </li>
               </ul>
             </div>
 
@@ -289,7 +350,9 @@ function App() {
               <div className="space-y-2 text-gray-300">
                 <p className="flex items-center gap-2">
                   <span>📞</span>
-                  <span>+91 8273441052</span>
+                  <a href="tel:+918273441052" className="hover:text-white transition-colors">
+                    +91 8273441052
+                  </a>
                 </p>
                 <p className="flex items-center gap-2">
                   <span>⏰</span>
@@ -297,7 +360,14 @@ function App() {
                 </p>
                 <p className="flex items-center gap-2">
                   <span>💬</span>
-                  <span>WhatsApp Available</span>
+                  <a 
+                    href="https://wa.me/918273441052" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-white transition-colors"
+                  >
+                    WhatsApp Available
+                  </a>
                 </p>
               </div>
             </div>
