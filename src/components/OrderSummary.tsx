@@ -8,7 +8,7 @@ interface OrderSummaryProps {
 }
 
 export function OrderSummary({ bookingData, onSubmit }: OrderSummaryProps) {
-  const [messagePending, setMessagePending] = React.useState(false);
+  const [whatsappSent, setWhatsappSent] = React.useState(false);
   
   const { religion, selectedKitItems, selectedServices, personalInfo } = bookingData;
   
@@ -17,7 +17,7 @@ export function OrderSummary({ bookingData, onSubmit }: OrderSummaryProps) {
   const grandTotal = kitTotal + servicesTotal;
 
   const generateWhatsAppMessage = () => {
-    let message = `🙏 *LAST RITES SERVICE BOOKING REQUEST*\n\n`;
+    let message = `🙏 *ZANAYA - LAST RITES SERVICE ARRANGEMENT REQUEST*\n\n`;
     
     // Personal Information
     message += `👤 *Personal Details:*\n`;
@@ -48,7 +48,7 @@ export function OrderSummary({ bookingData, onSubmit }: OrderSummaryProps) {
     
     // Total
     message += `💰 *GRAND TOTAL: ₹${grandTotal}*\n\n`;
-    message += `Please confirm this booking and provide further instructions. Thank you.`;
+    message += `Please confirm this arrangement and provide further instructions. Thank you for choosing Zanaya.`;
     
     return encodeURIComponent(message);
   };
@@ -57,65 +57,50 @@ export function OrderSummary({ bookingData, onSubmit }: OrderSummaryProps) {
     const message = generateWhatsAppMessage();
     const whatsappUrl = `https://wa.me/918273441052?text=${message}`;
     
-    setMessagePending(true);
-    
     // Open WhatsApp
     window.open(whatsappUrl, '_blank');
     
-    // Listen for when user returns to the tab (indicating they've sent the message)
-    const handleVisibilityChange = () => {
-      if (!document.hidden && messagePending) {
-        // Small delay to ensure user had time to send the message
-        setTimeout(() => {
-          setMessagePending(false);
-          onSubmit();
-        }, 1000);
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
-      }
-    };
-    
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    // Also listen for window focus as a backup
-    const handleWindowFocus = () => {
-      if (messagePending) {
-        setTimeout(() => {
-          setMessagePending(false);
-          onSubmit();
-        }, 1000);
-        window.removeEventListener('focus', handleWindowFocus);
-      }
-    };
-    
-    window.addEventListener('focus', handleWindowFocus);
+    // Set WhatsApp sent state
+    setWhatsappSent(true);
   };
 
-  // Show pending state if message is being sent
-  if (messagePending) {
+  const handleConfirmSent = () => {
+    onSubmit();
+  };
+
+  // Show pending state if WhatsApp was opened but not confirmed
+  if (whatsappSent) {
     return (
       <div className="w-full max-w-2xl mx-auto text-center">
         <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-200">
           <div className="flex justify-center mb-6">
             <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center">
-              <Clock size={48} className="text-yellow-600 animate-pulse" />
+              <MessageCircle size={48} className="text-yellow-600" />
             </div>
           </div>
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Message Pending</h2>
           <p className="text-gray-600 mb-6 text-lg">
-            Please complete sending your message on WhatsApp to confirm your booking.
+            Please complete sending your message on WhatsApp to confirm your arrangement request.
           </p>
-          <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+          <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200 mb-6">
             <p className="text-yellow-800 text-sm">
-              Once you send the message on WhatsApp and return to this page, 
-              your booking confirmation will be displayed.
+              After sending the message on WhatsApp, click the button below to see your confirmation.
             </p>
           </div>
-          <button
-            onClick={() => setMessagePending(false)}
-            className="mt-6 text-blue-600 hover:text-blue-700 font-medium text-sm underline"
-          >
-            Cancel and go back
-          </button>
+          <div className="flex gap-4 justify-center">
+            <button
+              onClick={handleConfirmSent}
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300"
+            >
+              I've Sent the Message
+            </button>
+            <button
+              onClick={() => setWhatsappSent(false)}
+              className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300"
+            >
+              Go Back
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -124,7 +109,7 @@ export function OrderSummary({ bookingData, onSubmit }: OrderSummaryProps) {
   return (
     <div className="w-full max-w-4xl mx-auto">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">Order Summary</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mb-4">Arrangement Summary</h2>
         <p className="text-gray-600">Review your selection before submitting</p>
       </div>
 
@@ -232,10 +217,10 @@ export function OrderSummary({ bookingData, onSubmit }: OrderSummaryProps) {
             className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center gap-3 text-lg"
           >
             <MessageCircle size={24} />
-            Submit via WhatsApp
+            Send Arrangement Request via WhatsApp
           </button>
           <p className="text-center text-sm text-gray-600 mt-3">
-            This will open WhatsApp with your booking details pre-filled
+            This will open WhatsApp with your arrangement details pre-filled
           </p>
         </div>
       </div>

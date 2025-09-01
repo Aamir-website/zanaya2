@@ -13,9 +13,9 @@ export function ConfirmationPage() {
         </div>
 
         {/* Success Message */}
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">Booking Request Sent!</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mb-4">Arrangement Request Confirmed!</h2>
         <p className="text-gray-600 mb-8 text-lg">
-          Your last rites service request has been sent via WhatsApp. Our team will contact you shortly to confirm the details and arrange the services.
+          Your last rites service request has been successfully sent via WhatsApp. Our Zanaya team will contact you shortly to confirm the details and coordinate all arrangements.
         </p>
 
         {/* Contact Information */}
@@ -26,21 +26,21 @@ export function ConfirmationPage() {
               <MessageCircle size={20} className="text-blue-600 mt-0.5" />
               <div>
                 <p className="font-medium text-gray-900">WhatsApp Confirmation</p>
-                <p className="text-gray-600 text-sm">You should see the WhatsApp chat window with your booking details</p>
+                <p className="text-gray-600 text-sm">Your arrangement details have been sent to our Zanaya team via WhatsApp</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <Phone size={20} className="text-blue-600 mt-0.5" />
               <div>
                 <p className="font-medium text-gray-900">Team Contact</p>
-                <p className="text-gray-600 text-sm">Our team will call you within 30 minutes to confirm details</p>
+                <p className="text-gray-600 text-sm">Our Zanaya team will call you within 30 minutes to confirm all details</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <Clock size={20} className="text-blue-600 mt-0.5" />
               <div>
                 <p className="font-medium text-gray-900">Service Arrangement</p>
-                <p className="text-gray-600 text-sm">We'll coordinate all services according to your requirements</p>
+                <p className="text-gray-600 text-sm">We'll coordinate all services and arrangements according to your faith and requirements</p>
               </div>
             </div>
           </div>
@@ -48,16 +48,16 @@ export function ConfirmationPage() {
 
         {/* Emergency Contact */}
         <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-          <p className="text-red-800 font-medium">Emergency Contact</p>
+          <p className="text-red-800 font-medium">24/7 Emergency Contact</p>
           <p className="text-red-700 text-sm">For urgent matters, call directly: +91 8273441052</p>
         </div>
 
         {/* New Booking Button */}
         <button
           onClick={() => window.location.reload()}
-          className="mt-8 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-300"
+          className="mt-8 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105"
         >
-          Make Another Booking
+          Make Another Arrangement
         </button>
       </div>
     </div>

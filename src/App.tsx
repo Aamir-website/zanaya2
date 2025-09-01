@@ -4,6 +4,7 @@ import { religions } from './data/religions';
 import { religionKits } from './data/kits';
 import { servicesByReligion } from './data/services';
 
+import { Homepage } from './components/Homepage';
 import { StepIndicator } from './components/StepIndicator';
 import { ReligionSelector } from './components/ReligionSelector';
 import { KitSelector } from './components/KitSelector';
@@ -14,6 +15,7 @@ import { ConfirmationPage } from './components/ConfirmationPage';
 import { ChevronLeft, ChevronRight, Heart } from 'lucide-react';
 
 const STEPS = [
+  'Home',
   'Religion',
   'Kit Items',
   'Services', 
@@ -24,6 +26,7 @@ const STEPS = [
 
 function App() {
   const [currentStep, setCurrentStep] = useState(0);
+  const [showHomepage, setShowHomepage] = useState(true);
   const [bookingData, setBookingData] = useState<BookingData>({
     religion: null,
     selectedKitItems: [],
@@ -48,6 +51,11 @@ function App() {
       }
     }
   }, [bookingData.religion]);
+
+  const handleBeginArrangement = () => {
+    setShowHomepage(false);
+    setCurrentStep(1); // Start with religion selection
+  };
 
   const handleReligionSelect = (religion: Religion) => {
     setBookingData(prev => ({ ...prev, religion }));
@@ -83,11 +91,11 @@ function App() {
 
   const canProceedToNext = () => {
     switch (currentStep) {
-      case 0: return bookingData.religion !== null;
-      case 1: return bookingData.selectedKitItems.length > 0;
-      case 2: return true; // Services are optional
-      case 3: return bookingData.personalInfo.name && bookingData.personalInfo.address && bookingData.personalInfo.phone;
-      case 4: return true;
+      case 1: return bookingData.religion !== null;
+      case 2: return bookingData.selectedKitItems.length > 0;
+      case 3: return true; // Services are optional
+      case 4: return bookingData.personalInfo.name && bookingData.personalInfo.address && bookingData.personalInfo.phone;
+      case 5: return true;
       default: return false;
     }
   };
@@ -99,18 +107,25 @@ function App() {
   };
 
   const prevStep = () => {
-    if (currentStep > 0) {
+    if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+    } else if (currentStep === 1) {
+      setShowHomepage(true);
+      setCurrentStep(0);
     }
   };
 
   const handleSubmit = () => {
-    setCurrentStep(5); // Move to confirmation page
+    setCurrentStep(6); // Move to confirmation page
   };
 
   const getCurrentStepContent = () => {
+    if (showHomepage) {
+      return <Homepage onBeginArrangement={handleBeginArrangement} />;
+    }
+
     switch (currentStep) {
-      case 0:
+      case 1:
         return (
           <ReligionSelector
             religions={religions}
@@ -119,7 +134,7 @@ function App() {
           />
         );
       
-      case 1:
+      case 2:
         if (!bookingData.religion) return null;
         const kit = religionKits.find(k => k.religionId === bookingData.religion.id);
         if (!kit) return null;
@@ -133,7 +148,7 @@ function App() {
           />
         );
       
-      case 2:
+      case 3:
         if (!bookingData.religion) return null;
         const availableServices = servicesByReligion[bookingData.religion.id as keyof typeof servicesByReligion] || [];
         
@@ -146,7 +161,7 @@ function App() {
           />
         );
       
-      case 3:
+      case 4:
         return (
           <PersonalInfoForm
             personalInfo={bookingData.personalInfo}
@@ -154,7 +169,7 @@ function App() {
           />
         );
       
-      case 4:
+      case 5:
         return (
           <OrderSummary
             bookingData={bookingData}
@@ -162,7 +177,7 @@ function App() {
           />
         );
       
-      case 5:
+      case 6:
         return <ConfirmationPage />;
       
       default:
@@ -177,10 +192,10 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="text-center">
             <h1 className="text-4xl font-bold text-gray-900 mb-2">
-              Last Rites Services
+              Zanaya
             </h1>
             <p className="text-gray-600 flex items-center justify-center gap-2">
-              Respectful and dignified farewell services
+              Compassionate last rites services with dignity and respect
               <Heart size={16} className="text-red-500" />
             </p>
           </div>
@@ -190,11 +205,11 @@ function App() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Step Indicator */}
-        {currentStep < 5 && (
+        {!showHomepage && currentStep < 6 && (
           <StepIndicator
-            currentStep={currentStep}
+            currentStep={currentStep - 1}
             totalSteps={5}
-            stepLabels={STEPS.slice(0, 5)}
+            stepLabels={STEPS.slice(1, 6)}
           />
         )}
 
@@ -204,24 +219,24 @@ function App() {
         </div>
 
         {/* Navigation */}
-        {currentStep < 4 && (
+        {!showHomepage && currentStep > 0 && currentStep < 5 && (
           <div className="flex justify-between items-center max-w-4xl mx-auto">
             <button
               onClick={prevStep}
-              disabled={currentStep === 0}
+              disabled={currentStep === 1}
               className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-colors ${
-                currentStep === 0
+                currentStep === 1
                   ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
                   : 'bg-gray-600 text-white hover:bg-gray-700'
               }`}
             >
               <ChevronLeft size={20} />
-              Previous
+              {currentStep === 1 ? 'Back to Home' : 'Previous'}
             </button>
             
             <div className="flex-1 text-center">
               <p className="text-sm text-gray-600">
-                Step {currentStep + 1} of {STEPS.length - 1}
+                Step {currentStep} of {STEPS.length - 2}
               </p>
             </div>
 
@@ -244,12 +259,49 @@ function App() {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-8 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-gray-300">
-            © 2024 Last Rites Services. Serving with compassion and respect.
-          </p>
-          <p className="text-gray-400 text-sm mt-2">
-            24/7 Emergency Contact: +91 8273441052
-          </p>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* Company Info */}
+            <div className="md:col-span-2">
+              <h3 className="text-xl font-bold mb-4">Zanaya</h3>
+              <p className="text-gray-300 mb-4">
+                Providing compassionate and dignified last rites services across all faiths. 
+                We understand the importance of honoring your loved ones with respect and tradition.
+              </p>
+              <p className="text-gray-400 text-sm">
+                © 2024 Zanaya. All rights reserved.
+              </p>
+            </div>
+
+            {/* Quick Links */}
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+              <ul className="space-y-2 text-gray-300">
+                <li><a href="#about" className="hover:text-white transition-colors">About Us</a></li>
+                <li><a href="#services" className="hover:text-white transition-colors">Our Services</a></li>
+                <li><a href="#contact" className="hover:text-white transition-colors">Contact</a></li>
+                <li><a href="#faq" className="hover:text-white transition-colors">FAQ</a></li>
+              </ul>
+            </div>
+
+            {/* Contact Info */}
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Contact Us</h4>
+              <div className="space-y-2 text-gray-300">
+                <p className="flex items-center gap-2">
+                  <span>📞</span>
+                  <span>+91 8273441052</span>
+                </p>
+                <p className="flex items-center gap-2">
+                  <span>⏰</span>
+                  <span>24/7 Emergency Support</span>
+                </p>
+                <p className="flex items-center gap-2">
+                  <span>💬</span>
+                  <span>WhatsApp Available</span>
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
